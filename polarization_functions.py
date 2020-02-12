@@ -12,6 +12,55 @@ from astropy.wcs import wcs
 
 import os, sys
 
+def get_biased_p_Vaillancourt(pd, sigma_p, fill_values = np.nan):
+    '''Takes a de-biased polarization fraction, and removes
+       the correction to get the original, biased value. 
+       The formula used is p_d = sqrt(p^2-sigma_p^2) (see Vaillancourt 2007)
+       For some threshold p/sigma_p the p_d is usually set to 0.
+       
+       Works with arrays too.
+       
+       Option fill_values is the number that is returned in place of p in the 
+              case that pd is zero (default: nan)
+              
+              
+              
+      Examples:
+          
+      1)  Input array:
+          pd = np.random.uniform(0.0001,0.0002,5)
+          sp = np.random.uniform(0.00002,0.0001,5)
+          # set a value to 0
+          pd[2]=0
+          
+          >>> get_biased_p_Vaillancourt(pd,sp, fill_values = np.zeros_like(pd))
+          >>> array([0.00020036, 0.00013045, 0.        , 0.00014775, 0.00016685])
+    
+      2)  Provide (q^2+u^2)^(1/2) as fill values
+          q = 0.1
+          u = -0.04
+          sp = 0.1
+          pd = 0.
+          get_biased_p_Vaillancourt(pd,sp, fill_values = np.sqrt(q**2+u**2))
+    '''
+    
+    if isinstance(pd, np.ndarray):
+        p = np.zeros_like(pd)+fill_values
+        mask_zeros = pd != 0.
+        p[mask_zeros] = np.sqrt( np.power(pd[mask_zeros],2) + np.power(sigma_p[mask_zeros],2) )
+        
+        return p
+    
+    elif isinstance(pd, int) or isinstance(pd,float):
+        if float(pd) == 0.:
+            return fill_values
+        else:
+            return np.sqrt(pd**2+sigma_p**2)
+    
+    else:
+        raise TypeError('Input should be float, int or numpy array')
+        
+    return
 
 def conf_lims_MAS(pmassnr, sigma = 1):
     '''
