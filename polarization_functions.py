@@ -113,10 +113,14 @@ def EVPA_pdf(theta,P0):
     EVPA measurements are also non-Gaussian and defined by the following
     probability density (Naghizadeh-Khouei & Clarke 1993):
     """
+    if isinstance(P0, int):
+        P0 = float(P0)
+    elif isinstance(P0, np.ndarray):
+        P0 = P0.astype(float)
     g = 1/np.sqrt(np.pi)
-    ita0 = float(P0)/np.sqrt(2) * np.cos(2 * theta)
+    ita0 = P0/np.sqrt(2) * np.cos(2 * theta)
     g = g * (g + ita0 * np.exp(ita0**2) * (1 + erf(ita0)))
-    g = g * np.exp(-(float(P0)**2)/2)
+    g = g * np.exp(-(P0**2)/2)
     return g
 
 def int_eq(sigma,snr):
