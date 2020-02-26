@@ -172,4 +172,15 @@ def p_EVPA_from_qu(q,u,sq,su):
     return p, s_p, evpa, s_evpa
 
 
+def qu_from_p_EVPA(p,evpa,e_p,e_evpa):    
+    '''compute stokes parameters and uncertainties given p, e_p, evpa, e_evpa    
+       EVPA, uncertainty in radians
+    '''
+    #
+    q=np.multiply(p,np.cos(2*evpa))
+    u=np.multiply(p,np.sin(2*evpa))
+    e_q=np.sqrt((np.power(e_p*np.cos(2*evpa),2))+(np.power(e_evpa*p*2*np.sin(2*evpa),2)))
+    e_u=np.sqrt((np.power(e_p*np.sin(2*evpa),2))+(np.power(e_evpa*p*2*np.cos(2*evpa),2)))    
+    return q, u, e_q, e_u
+
 
